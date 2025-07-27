@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT 2025: The 99th Percentile Interactive Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: "Calm Focus" - A blend of warm neutrals (bg-stone-50, bg-stone-100), supportive blues (bg-sky-600, text-sky-800), and a subtle, encouraging accent (amber-500). -->
+    <!-- Application Structure Plan: The SPA is designed as a personal, interactive journey for the CAT aspirant, moving from high-level understanding to detailed strategy. The structure is thematic and task-oriented, not a mirror of the report. 1. **Hero Section**: Grabs attention and sets the goal. 2. **Dashboard**: Provides an immediate interactive overview of the exam structure and score targets. This is more engaging than a static table. 3. **Interactive Timeline**: Translates the three-phased preparation plan into a visual, step-by-step guide. This makes the long journey feel manageable. 4. **Day-wise Plan**: A new, detailed section providing a granular, actionable schedule based on the phased timeline. 5. **Sectional Deep Dive**: Uses a tabbed interface for VARC, DILR, and QA. This organizes the most dense part of the report into easily digestible, self-contained modules. Users can focus on one area at a time. 6. **Resource Explorer**: Converts the list of books and tools into a filterable, card-based library. This is more user-friendly and allows for quick access to relevant resources. 7. **Mindset & Mocks**: Focuses on the psychological aspect, using interactive checklists and carousels to make advice more engaging and actionable. This structure was chosen to empower the user, allowing them to explore content based on their immediate needs (e.g., "What score do I need?" or "What's my plan for this week?") rather than forcing a linear read. -->
+    <!-- Visualization & Content Choices: 1. **CAT Structure (Donut Chart)**: Goal: Inform. Viz: Chart.js Donut Chart. Interaction: Hover to see question counts. Justification: Visually represents the weight of each section. Library: Chart.js. 2. **Score vs. Percentile (Line Chart)**: Goal: Change/Compare. Viz: Chart.js Line Chart. Interaction: Buttons to switch between years. Justification: Shows the dynamic nature of target scores and the impact of paper difficulty. Library: Chart.js. 3. **QA Topic Weightage (Bar Chart)**: Goal: Inform/Organize. Viz: Chart.js Bar Chart. Interaction: Hover for details. Justification: Highlights high-yield topics for strategic focus. Library: Chart.js. 4. **Preparation Phases (Timeline)**: Goal: Organize. Viz: HTML/CSS/Tailwind Diagram. Interaction: Clickable phases. Justification: Makes the long-term plan less daunting and more structured. Method: Custom HTML/CSS. 5. **Day-wise Plan Tables**: Goal: Organize. Viz: HTML/CSS Tables. Interaction: None. Justification: Presents the detailed schedule in a clear, structured format for daily reference. Method: Custom HTML/CSS. 6. **DILR Set Selection (Interactive Matrix)**: Goal: Organize/Inform. Viz: HTML/CSS Table. Interaction: Hover on rows for emphasis. Justification: Translates a complex strategy into a practical, visual decision-making tool. Method: Custom HTML/CSS. 7. **Mock Analysis (Checklist)**: Goal: Organize. Viz: Interactive HTML checklist. Interaction: Click to check items. Justification: Turns passive advice into an active, repeatable process. Method: Custom HTML/JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0284c7; /* sky-600 */
+            border-bottom-color: #0284c7; /* sky-600 */
+        }
+        .tab-button {
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            background-color: #0369a1; /* sky-700 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+         @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #0369a1; /* sky-700 */
+            border: 3px solid #e0f2fe; /* sky-100 */
+        }
+        .card-hover {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-sky-800">CAT 2025 Blueprint</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#dashboard" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Dashboard</a>
+                        <a href="#timeline" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Timeline</a>
+                        <a href="#daywise-plan" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Day-wise Plan</a>
+                        <a href="#strategy" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Strategy</a>
+                        <a href="#resources" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Resources</a>
+                        <a href="#mindset" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600">Mindset</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        
+        <section id="hero" class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-sky-800 tracking-tight">Your Journey to the 99th Percentile Starts Now</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">This interactive guide translates the comprehensive CAT 2025 strategy report into an actionable, personalized blueprint. Explore the data, master the strategies, and build the mindset of a top performer.</p>
+        </section>
+
+        <section id="dashboard" class="mb-16 scroll-mt-20">
+            <h3 class="text-3xl font-bold text-center mb-2 text-slate-900">The CAT Landscape Dashboard</h3>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">The modern CAT rewards accuracy and strategy over pure speed. This dashboard provides an interactive overview of the exam structure and the dynamic score targets you should aim for. Use the controls to see how scores have varied over the years.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <h4 class="text-xl font-semibold mb-4 text-center text-sky-800">CAT Exam Structure</h4>
+                    <div class="chart-container" style="height:300px;">
+                        <canvas id="examStructureChart"></canvas>
+                    </div>
+                     <p class="text-center text-sm text-slate-500 mt-4">Hover over a section to see the typical number of questions. The exam is 120 minutes total, with a strict 40-minute limit for each section.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <h4 class="text-xl font-semibold mb-4 text-center text-sky-800">Score vs. Percentile Trends</h4>
+                    <div class="chart-container" style="height:300px;">
+                        <canvas id="scorePercentileChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <span class="text-sm font-medium text-slate-600 mr-4">View Data For:</span>
+                        <button onclick="updateScoreChart('CAT 2022')" class="year-btn active bg-sky-600 text-white px-3 py-1 rounded-full text-sm">2022</button>
+                        <button onclick="updateScoreChart('CAT 2023')" class="year-btn bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-sm">2023</button>
+                        <button onclick="updateScoreChart('CAT 2024')" class="year-btn bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-sm">2024 (Est.)</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="timeline" class="mb-16 scroll-mt-20">
+            <h3 class="text-3xl font-bold text-center mb-2 text-slate-900">Your Phased Preparation Timeline</h3>
+            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">A successful CAT journey is a marathon, not a sprint. This timeline breaks down your preparation into three manageable phases. Focus on the objective of each phase to build momentum and peak at the right time.</p>
+            <div class="relative pl-8 border-l-2 border-sky-200">
+                <div class="mb-12 timeline-item">
+                    <h4 class="text-2xl font-semibold text-sky-800">Phase I: Foundation Building (First 4-5 Months)</h4>
+                    <p class="text-slate-600 mt-2">The non-negotiable goal is complete conceptual clarity. Forget speed; focus on understanding the 'why' behind every concept. A strong foundation is the bedrock of a 99th percentile score.</p>
+                    <ul class="mt-4 space-y-2 list-disc list-inside text-slate-700">
+                        <li><span class="font-semibold">QA:</span> Master fundamentals from NCERT (6-10). Prioritize Arithmetic & Algebra.</li>
+                        <li><span class="font-semibold">VARC:</span> Cultivate a daily, active reading habit from diverse, high-quality sources.</li>
+                        <li><span class="font-semibold">DILR:</span> Understand the mechanics of basic set types (arrangements, Venn diagrams).</li>
+                    </ul>
+                </div>
+                <div class="mb-12 timeline-item">
+                    <h4 class="text-2xl font-semibold text-sky-800">Phase II: Application & Accuracy (Next 3-4 Months)</h4>
+                    <p class="text-slate-600 mt-2">Transition from learning to active problem-solving. The mantra is "accuracy first; speed will follow." Build a robust problem-solving muscle by tackling a wide variety of questions.</p>
+                     <ul class="mt-4 space-y-2 list-disc list-inside text-slate-700">
+                        <li>Take topic-wise and sectional tests to build stamina.</li>
+                        <li>Maintain a detailed <span class="font-semibold">Error Log</span> to track and eliminate recurring mistakes.</li>
+                        <li>Consolidate learning: create formula sheets for QA and practice 2-3 diverse DILR sets daily.</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <h4 class="text-2xl font-semibold text-sky-800">Phase III: Strategic Refinement & Mocks (Final 3-4 Months)</h4>
+                    <p class="text-slate-600 mt-2">This phase is dominated by taking and, more importantly, analyzing full-length mock tests. The goal is to master test-taking strategy, optimize time management, and build mental resilience.</p>
+                     <ul class="mt-4 space-y-2 list-disc list-inside text-slate-700">
+                        <li>Take 1-2 high-quality mocks per week under exam conditions.</li>
+                        <li>Dedicate <span class="font-semibold">3-4 hours to analyzing each mock</span>—this is where the real learning happens.</li>
+                        <li>Solve previous years' CAT papers to benchmark against the actual exam standard.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="daywise-plan" class="mb-16 scroll-mt-20">
+            <h3 class="text-3xl font-bold text-center mb-2 text-slate-900">Your 125-Day Intensive Study Plan</h3>
+            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">Here is your day-by-day guide from July 28 to November 30. This intensive plan translates the high-level strategy into concrete, daily tasks to keep you on track.</p>
+
+            <div class="space-y-12">
+                <div>
+                    <h4 class="text-2xl font-bold text-center text-sky-800 mb-6">Phase 1: Concept Mastery & Application (Weeks 1-11)</h4>
+                    <div class="bg-sky-50 border-l-4 border-sky-500 text-sky-800 p-4 rounded-r-lg mb-8">
+                        <h5 class="font-bold">Your Daily VARC Mandate (Non-Negotiable)</h5>
+                        <ul class="list-disc list-inside mt-2 text-sm">
+                            <li>**45-60 mins Active Reading:** Read one article (Aeon, The Economist, etc.) and write a one-paragraph summary.</li>
+                            <li>**Practice:** Solve 2 RC passages and 5 VA questions daily.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-lg card-hover mb-8">
+                        <h5 class="text-xl font-semibold text-center text-sky-800 mb-4">Weekly Study Template</h5>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                    <tr>
+                                        <th class="px-4 py-3">Day</th>
+                                        <th class="px-4 py-3">Morning Session (1.5-2 hrs)</th>
+                                        <th class="px-4 py-3">Evening Session (1.5-2 hrs)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold">Monday</td><td class="px-4 py-2">QA: New Topic Concepts</td><td class="px-4 py-2">QA: Practice (LOD 1)</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-semibold">Tuesday</td><td class="px-4 py-2">DILR: New Set Type Concepts</td><td class="px-4 py-2">DILR: Practice 2-3 Sets</td></tr>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold">Wednesday</td><td class="px-4 py-2">QA: New Topic Concepts</td><td class="px-4 py-2">QA: Practice (LOD 1 & 2)</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-semibold">Thursday</td><td class="px-4 py-2">DILR: New Set Type Concepts</td><td class="px-4 py-2">DILR: Practice 2-3 Sets</td></tr>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold">Friday</td><td class="px-4 py-2">QA: Mixed Practice</td><td class="px-4 py-2">DILR: Mixed Practice</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-semibold">Saturday</td><td class="px-4 py-2 font-bold text-sky-700">1 Sectional Test</td><td class="px-4 py-2 font-bold text-sky-700">Deep Analysis & Revise</td></tr>
+                                    <tr><td class="px-4 py-2 font-semibold">Sunday</td><td class="px-4 py-2">Update Error Log & Revise</td><td class="px-4 py-2">Buffer / Relax</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                            <h5 class="font-bold text-lg text-slate-800">Weeks 1-4: Arithmetic</h5>
+                            <ul class="mt-2 space-y-1 text-sm text-slate-600 list-disc list-inside">
+                                <li>**W1:** Diagnostic Mock, Percentages, P&L, Tables & Bar Charts.</li>
+                                <li>**W2:** SI/CI, Ratios, Line & Pie Charts.</li>
+                                <li>**W3:** Averages, Mixtures, Linear Arrangements.</li>
+                                <li>**W4:** TSD, Time & Work, Circular Arrangements.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                            <h5 class="font-bold text-lg text-slate-800">Weeks 5-8: Algebra</h5>
+                             <ul class="mt-2 space-y-1 text-sm text-slate-600 list-disc list-inside">
+                                <li>**W5:** Equations, Venn Diagrams.</li>
+                                <li>**W6:** Inequalities, Functions, Games (Round Robin).</li>
+                                <li>**W7:** Progressions, Logs, Maxima/Minima Sets.</li>
+                                <li>**W8:** Consolidation, Games (Knockout).</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                            <h5 class="font-bold text-lg text-slate-800">Weeks 9-11: Finishing</h5>
+                             <ul class="mt-2 space-y-1 text-sm text-slate-600 list-disc list-inside">
+                                <li>**W9:** Triangles, Quant-based Reasoning.</li>
+                                <li>**W10:** Circles, Mensuration, Complex Caselets.</li>
+                                <li>**W11:** P&C, Probability, Number System, DILR Strategy.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-2xl font-bold text-center text-sky-800 mb-6">Phase 2: Mock Season & Refinement (Weeks 12-17)</h4>
+                    <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                         <h5 class="text-xl font-semibold text-center text-sky-800 mb-4">Weekly Mock Template</h5>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                    <tr><th class="px-4 py-3">Day</th><th class="px-4 py-3">Activity</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold">Monday</td><td class="px-4 py-2">Revise Weak QA topics from mock analysis.</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-semibold">Tuesday</td><td class="px-4 py-2">Revise Weak DILR/VARC topics. Practice 2-3 tough DILR sets.</td></tr>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold text-red-600">Wednesday</td><td class="px-4 py-2 font-bold">Take Full-Length Mock 1 (Simulate Exam Conditions).</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-semibold">Thursday</td><td class="px-4 py-2 font-bold text-sky-700">Deep Analysis of Mock 1 (3-4 hours). Update Error Log.</td></tr>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold">Friday</td><td class="px-4 py-2">Work on specific weaknesses identified. Revise formulas.</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-semibold text-red-600">Saturday</td><td class="px-4 py-2 font-bold">Take Full-Length Mock 2 (Simulate Exam Conditions).</td></tr>
+                                    <tr><td class="px-4 py-2 font-semibold">Sunday</td><td class="px-4 py-2 font-bold text-sky-700">Deep Analysis of Mock 2 (3-4 hours). Plan for next week.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-2xl font-bold text-center text-sky-800 mb-6">Phase 3: The Final Countdown (Week 18)</h4>
+                    <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                         <h5 class="text-xl font-semibold text-center text-sky-800 mb-4">Final Week Plan (Nov 24-29)</h5>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                    <tr><th class="px-4 py-3">Day</th><th class="px-4 py-3">Activity</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold">Monday, Nov 24</td><td class="px-4 py-2">Light revision of QA formulas. Final Error Log review.</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-semibold">Tuesday, Nov 25</td><td class="px-4 py-2">Light revision of DILR approaches. Light reading.</td></tr>
+                                    <tr class="border-b"><td class="px-4 py-2 font-semibold">Wednesday, Nov 26</td><td class="px-4 py-2">Final VARC strategy review. Taper down studies.</td></tr>
+                                    <tr class="border-b bg-amber-50"><td class="px-4 py-2 font-semibold">Thursday, Nov 27</td><td class="px-4 py-2 font-bold text-amber-800">No Studies. Relax completely.</td></tr>
+                                    <tr class="border-b bg-amber-50"><td class="px-4 py-2 font-semibold">Friday, Nov 28</td><td class="px-4 py-2 font-bold text-amber-800">No Studies. Organize exam essentials.</td></tr>
+                                    <tr class="bg-amber-50"><td class="px-4 py-2 font-semibold">Saturday, Nov 29</td><td class="px-4 py-2 font-bold text-amber-800">No Studies. Stay calm. Sleep well.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="strategy" class="mb-16 scroll-mt-20">
+            <h3 class="text-3xl font-bold text-center mb-2 text-slate-900">Section-Wise Mastery Playbook</h3>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">A high overall percentile requires strong performance in all three sections. Use this interactive playbook to dive deep into the specific strategies for VARC, DILR, and QA. Select a section to reveal its mastery plan.</p>
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                <div class="mb-6 flex flex-wrap justify-center gap-2 sm:gap-4">
+                    <button class="tab-button active px-4 py-2 text-sm sm:text-base font-semibold rounded-full" onclick="showTab('varc')">VARC Strategy</button>
+                    <button class="tab-button bg-slate-100 text-slate-700 px-4 py-2 text-sm sm:text-base font-semibold rounded-full" onclick="showTab('dilr')">DILR Strategy</button>
+                    <button class="tab-button bg-slate-100 text-slate-700 px-4 py-2 text-sm sm:text-base font-semibold rounded-full" onclick="showTab('qa')">QA Strategy</button>
+                </div>
+                
+                <div id="varc" class="tab-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-lg text-sky-800 mb-2">RC is King (67% of Section)</h4>
+                            <p class="text-slate-600">Mastery of Reading Comprehension is non-negotiable. Focus on "Strategic Reading"—a focused pace to build a mental map of the passage, not just speed reading. Practice eliminating options systematically by spotting common traps: Too Extreme, Out of Scope, Reverse Answer, and One-Word-Off.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-sky-800 mb-2">VA Strategy (TITA is Key)</h4>
+                            <p class="text-slate-600">Verbal Ability questions (Para-jumbles, Summary, Odd-One-Out) offer a high return on time. For Para-jumbles, find mandatory pairs. For summaries, create your own before looking at options. Since many VA questions are TITA (no negative marking), attempting every single one is a risk-free strategic advantage.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dilr" class="tab-content hidden">
+                    <h4 class="font-semibold text-lg text-sky-800 mb-4 text-center">Set Selection is 50% of the Battle</h4>
+                    <p class="text-slate-600 mb-6 text-center">Success in DILR is about strategy, not solving everything. The goal is to select 2-3 solvable sets and execute them with high accuracy. Use the "First 5-7 Minutes Rule" to scan all sets and categorize them before attempting to solve any.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-500">
+                            <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Set Type</th>
+                                    <th scope="col" class="px-6 py-3 text-green-600">Positive Indicators (Go)</th>
+                                    <th scope="col" class="px-6 py-3 text-red-600">Negative Indicators (Caution)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b hover:bg-sky-50">
+                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Arrangements</th>
+                                    <td class="px-6 py-4">Fewer variables, direct clues, familiar structure.</td>
+                                    <td class="px-6 py-4">Many variables, multiple cases, complex conditions.</td>
+                                </tr>
+                                <tr class="bg-white border-b hover:bg-sky-50">
+                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Games & Tournaments</th>
+                                    <td class="px-6 py-4">Standard format, clear scoring, structured data.</td>
+                                    <td class="px-6 py-4">Unconventional format, many "if/then" scenarios.</td>
+                                </tr>
+                                <tr class="bg-white border-b hover:bg-sky-50">
+                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Venn Diagrams</th>
+                                    <td class="px-6 py-4">2-3 sets, direct data points, simple questions.</td>
+                                    <td class="px-6 py-4">4+ sets, "at least/at most" language, requires equations.</td>
+                                </tr>
+                                <tr class="bg-white hover:bg-sky-50">
+                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">DI Caselets</th>
+                                    <td class="px-6 py-4">Clean graphs, direct data, simple calculations.</td>
+                                    <td class="px-6 py-4">Multiple interconnected graphs, calculation-heavy.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="qa" class="tab-content hidden">
+                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h4 class="font-semibold text-lg text-sky-800 mb-2">Focus on High-Yield Topics</h4>
+                            <p class="text-slate-600 mb-4">Arithmetic and Algebra consistently form over 70% of the QA section. Mastering these two domains provides the highest return on your time investment. Geometry is the next priority.</p>
+                             <h4 class="font-semibold text-lg text-sky-800 mb-2">Adopt the Round-Based Strategy</h4>
+                            <p class="text-slate-600">Do not attempt the paper linearly. Use a 3-round approach:</p>
+                            <ul class="mt-2 space-y-1 list-decimal list-inside text-slate-700">
+                                <li><b>Round 1 (15-20 min):</b> Solve all easy, "low-hanging fruit" questions.</li>
+                                <li><b>Round 2 (15 min):</b> Tackle medium-difficulty questions.</li>
+                                <li><b>Round 3 (5-10 min):</b> Revisit marked questions or attempt a tough one from a strong area.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="text-lg font-semibold mb-2 text-center text-sky-800">Typical QA Topic Weightage</h4>
+                            <div class="chart-container" style="height:250px;">
+                                <canvas id="qaTopicChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="resources" class="mb-16 scroll-mt-20">
+            <h3 class="text-3xl font-bold text-center mb-2 text-slate-900">Your Curated Arsenal</h3>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">A great strategy needs the right tools. This is a curated list of the most recommended resources. Use the filters to find what you need for each stage of your preparation.</p>
+            <div class="flex justify-center mb-6 gap-2">
+                <button class="resource-filter-btn active bg-sky-600 text-white px-4 py-1 rounded-full text-sm" onclick="filterResources('all')">All</button>
+                <button class="resource-filter-btn bg-slate-200 text-slate-700 px-4 py-1 rounded-full text-sm" onclick="filterResources('book')">Books</button>
+                <button class="resource-filter-btn bg-slate-200 text-slate-700 px-4 py-1 rounded-full text-sm" onclick="filterResources('digital')">Digital</button>
+            </div>
+            <div id="resource-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+
+        <section id="mindset" class="scroll-mt-20">
+            <h3 class="text-3xl font-bold text-center mb-2 text-slate-900">Cultivating a Champion's Mindset</h3>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">The journey to the 99th percentile is a psychological battle. Use these interactive tools to master mock analysis, manage stress, and build the resilience of a top performer.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <h4 class="text-xl font-semibold text-sky-800 mb-4">The Science of Mock Analysis</h4>
+                    <p class="text-slate-600 mb-4">A mock taken without analysis is a wasted opportunity. Use this checklist after every mock to ensure you extract maximum learning.</p>
+                    <div id="mock-checklist" class="space-y-3">
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg card-hover">
+                    <h4 class="text-xl font-semibold text-sky-800 mb-4">Mental Fortitude Toolkit</h4>
+                    <p class="text-slate-600 mb-4">Consistency, stress management, and motivation are key. Here are actionable tips from toppers.</p>
+                    <ul class="space-y-3 list-disc list-inside text-slate-700">
+                        <li><b>Manage Stress:</b> Build a structured routine, practice mindfulness, and prioritize 7-8 hours of sleep.</li>
+                        <li><b>Sustain Motivation:</b> Break down your goal into daily targets. Track your progress and celebrate small wins.</li>
+                        <li><b>Embrace Consistency:</b> 3-4 focused hours daily is more effective than sporadic 10-hour sessions. Make it a habit.</li>
+                        <li><b>Learn from Setbacks:</b> View low mock scores not as failures, but as diagnostic reports that show you exactly where to improve.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+            <p>&copy; 2025 CAT Aspirant. All the best for your journey to the 99th percentile!</p>
+            <p class="text-xs text-slate-400 mt-2">This interactive guide is based on the "The 99th Percentile Blueprint" report.</p>
+        </div>
+    </footer>
+
+    <script>
+        let examStructureChart, scorePercentileChart, qaTopicChart;
+
+        const scoreData = {
+            'CAT 2022': {
+                labels: ['90.0', '95.0', '98.0', '99.0', '99.5'],
+                scores: [51, 63, 73, 83, 92]
+            },
+            'CAT 2023': {
+                labels: ['90.0', '95.0', '98.0', '99.0', '99.5'],
+                scores: [45, 55, 67, 77, 85]
+            },
+            'CAT 2024': {
+                labels: ['90.0', '95.0', '98.0', '99.0', '99.5'],
+                scores: [51, 62, 71, 93, 105]
+            }
+        };
+
+        const resourcesData = [
+            { id: 1, type: 'book', category: 'QA', title: 'How to Prepare for QA for CAT', author: 'Arun Sharma', description: 'A comprehensive guide with graded exercises, essential for building a strong foundation and advancing your skills.' },
+            { id: 2, type: 'book', category: 'DILR', title: 'LRDI for the CAT', author: 'Nishit K. Sinha', description: 'Offers a wide variety of sets and explains different logical structures, crucial for mastering DILR.' },
+            { id: 3, type: 'book', category: 'VARC', title: 'How to Prepare for VARC for CAT', author: 'Arun Sharma & M. Upadhyay', description: 'Covers RC and VA strategies in depth, with plenty of practice passages and questions.' },
+            { id: 4, type: 'book', category: 'Foundation', title: 'Word Power Made Easy', author: 'Norman Lewis', description: 'A classic for building a strong vocabulary, which aids reading speed and comprehension.' },
+            { id: 5, type: 'digital', category: 'Mocks', title: 'Mock Test Series (IMS, TIME, CL)', author: 'Various Institutes', description: 'The most critical investment. Subscribe to 2+ series for varied practice and robust benchmarking.' },
+            { id: 6, type: 'digital', category: 'Practice', title: 'Previous Year Papers', author: 'IIMs', description: 'Non-negotiable for understanding the true exam pattern, question style, and difficulty level.' },
+            { id: 7, type: 'digital', category: 'Concepts', title: 'Rodha YouTube Channel', author: 'Ravi Prakash', description: 'Highly recommended by toppers for clear, insightful explanations of complex QA and DILR concepts.' },
+            { id: 8, type: 'book', category: 'QA', title: 'Quantum CAT', author: 'Sarvesh Verma', description: 'Excellent for advanced problem-solving practice in the later stages of preparation.' },
+        ];
+        
+        const mockChecklistItems = [
+            { text: 'Re-attempt the paper without time constraints.' },
+            { text: 'Categorize every error: Conceptual Gap, Application Error, Silly Mistake, or Strategic Error.' },
+            { text: 'Analyze unattempted questions: Was it a time issue or a knowledge gap?' },
+            { text: 'Review all correct answers to ensure the method was efficient.' },
+            { text: 'Devise specific, actionable steps for the next week based on the analysis.' },
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createExamStructureChart();
+            createScorePercentileChart('CAT 2022');
+            createQaTopicChart();
+            populateResources();
+            populateMockChecklist();
+            setupNavigation();
+        });
+
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        function createExamStructureChart() {
+            const ctx = document.getElementById('examStructureChart').getContext('2d');
+            examStructureChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['VARC (Verbal & RC)', 'DILR (Data & Logic)', 'QA (Quantitative Aptitude)'],
+                    datasets: [{
+                        label: 'Question Distribution',
+                        data: [24, 22, 22],
+                        backgroundColor: ['#38bdf8', '#0ea5e9', '#0284c7'],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw} questions`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        function createScorePercentileChart(year) {
+            const ctx = document.getElementById('scorePercentileChart').getContext('2d');
+            const data = scoreData[year];
+            scorePercentileChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: `Overall Score for ${year}`,
+                        data: data.scores,
+                        fill: true,
+                        backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                        borderColor: '#0284c7',
+                        tension: 0.3,
+                        pointBackgroundColor: '#0284c7',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'Raw Score (out of 204)' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Percentile' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Score: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateScoreChart(year) {
+            if (scorePercentileChart) {
+                scorePercentileChart.destroy();
+            }
+            createScorePercentileChart(year);
+
+            document.querySelectorAll('.year-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-sky-600', 'text-white');
+                btn.classList.add('bg-slate-200', 'text-slate-700');
+            });
+            const selectedBtn = document.querySelector(`.year-btn[onclick="updateScoreChart('${year}')"]`);
+            selectedBtn.classList.add('active', 'bg-sky-600', 'text-white');
+            selectedBtn.classList.remove('bg-slate-200', 'text-slate-700');
+        }
+
+        function createQaTopicChart() {
+            const ctx = document.getElementById('qaTopicChart').getContext('2d');
+            qaTopicChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Arithmetic', 'Algebra', 'Geometry', 'Modern Math', 'Number System'],
+                    datasets: [{
+                        label: '% of Questions',
+                        data: [40, 35, 15, 5, 5],
+                        backgroundColor: ['#0284c7', '#0ea5e9', '#38bdf8', '#7dd3fc', '#bae6fd'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Approx. ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Weightage (%)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabName).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const selectedBtn = document.querySelector(`.tab-button[onclick="showTab('${tabName}')"]`);
+            selectedBtn.classList.add('active');
+            selectedBtn.classList.remove('bg-slate-100', 'text-slate-700');
+        }
+
+        function populateResources() {
+            const grid = document.getElementById('resource-grid');
+            grid.innerHTML = '';
+            const filteredData = resourcesData.filter(resource => {
+                const activeFilter = document.querySelector('.resource-filter-btn.active').getAttribute('onclick').match(/'([^']+)'/)[1];
+                return activeFilter === 'all' || resource.type === activeFilter;
+            });
+
+            filteredData.forEach(resource => {
+                const card = `
+                    <div class="bg-white p-6 rounded-xl shadow-lg card-hover flex flex-col">
+                        <div class="flex-grow">
+                            <span class="text-xs font-semibold uppercase px-2 py-1 rounded-full ${resource.type === 'book' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'}">${resource.type}</span>
+                            <h5 class="font-bold text-lg mt-3 mb-1 text-slate-900">${resource.title}</h5>
+                            <p class="text-sm text-slate-500 mb-3">By ${resource.author}</p>
+                            <p class="text-slate-600 text-sm">${resource.description}</p>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function filterResources(filter) {
+            document.querySelectorAll('.resource-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-sky-600', 'text-white');
+                btn.classList.add('bg-slate-200', 'text-slate-700');
+            });
+            const selectedBtn = document.querySelector(`.resource-filter-btn[onclick="filterResources('${filter}')"]`);
+            selectedBtn.classList.add('active', 'bg-sky-600', 'text-white');
+            selectedBtn.classList.remove('bg-slate-200', 'text-slate-700');
+            populateResources();
+        }
+        
+        function populateMockChecklist() {
+            const container = document.getElementById('mock-checklist');
+            container.innerHTML = '';
+            mockChecklistItems.forEach((item, index) => {
+                const checklistItem = `
+                    <label for="check-${index}" class="flex items-center p-3 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" id="check-${index}" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                        <span class="ml-3 text-slate-700">${item.text}</span>
+                    </label>
+                `;
+                container.innerHTML += checklistItem;
+            });
+        }
+
+    </script>
+</body>
+</html>
